@@ -1,25 +1,26 @@
-# To-Do List API
+# To-Do List Full-Stack App
 
-This is the backend for a To-Do List application, built with Node.js, Express.js, and MongoDB. It implements a fully functional RESTful API with a structured Controller-Service-Route architecture.
+This is a complete To-Do List application, built with a **React** frontend and a **Node.js, Express.js, and MongoDB** backend.
 
-## Architecture
+## Project Structure
 
-The project is structured into different layers to separate concerns:
-- **Routes**: Maps HTTP methods and endpoints to specific Controller functions.
-- **Controllers**: Handles incoming HTTP requests, extracts parameters/body, and returns HTTP responses.
-- **Services**: Contains the core business logic and interacts with the Mongoose Models.
-- **Models**: Defines the schema and data validation for MongoDB.
+The project is divided into two main parts:
+- **`server/`** (or root): Contains the Node.js backend (RESTful API with a Controller-Service-Route architecture).
+- **`client/`**: Contains the React frontend powered by Vite, handling user interaction and state management.
+
+---
 
 ## Prerequisites
 - Node.js installed
 - MongoDB installed locally or a MongoDB Atlas connection string
 
-## Setup Instructions
+---
 
-1. **Clone the repository** (if you haven't already):
+## Backend Setup (Node.js + MongoDB)
+
+1. **Navigate to the root/server directory**:
    ```bash
-   git clone <repository_url>
-   cd mongo
+   cd path/to/backend/folder
    ```
 
 2. **Install dependencies**:
@@ -28,27 +29,48 @@ The project is structured into different layers to separate concerns:
    ```
 
 3. **Configure Environment Variables**:
-   Ensure you have a `.env` file in the root directory. Modify the variables as needed. Example `.env`:
+   Create a `.env` file for the backend. Example `.env`:
    ```env
    NODE_ENV=development
    PORT=5000
    MONGO_URI=mongodb://localhost:27017/todo-list
    ```
 
-4. **Run the application**:
-   - For development mode (uses nodemon):
-     ```bash
-     npm run dev
-     ```
-   - For standard start:
-     ```bash
-     npm start
-     ```
-   (Note: Ensure `start` or `dev` scripts are present in `package.json`, or run `node server.js`).
+4. **Run the backend application**:
+   ```bash
+   npm run dev
+   ```
+   *The server will run on `http://localhost:5000`*
 
-## API Endpoints
+---
 
-All endpoints are prefixed with `/api/tasks`
+## Frontend Setup (React + Vite)
+
+1. **Navigate to the `client` directory**:
+   ```bash
+   cd client
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables (Optional)**:
+   The frontend automatically points to `http://localhost:5000/api/tasks`. If you deploy the backend somewhere else, you can create a `.env` file in the `client` directory:
+   ```env
+   VITE_API_URL=https://your-deployed-backend-url.com/api/tasks
+   ```
+
+4. **Run the React application**:
+   ```bash
+   npm run dev
+   ```
+   *The frontend will run on `http://localhost:5173`*
+
+---
+
+## API Endpoints (`/api/tasks`)
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -58,8 +80,12 @@ All endpoints are prefixed with `/api/tasks`
 | PUT | `/api/tasks/:id` | Update an existing task |
 | DELETE | `/api/tasks/:id` | Delete a task |
 
+---
+
 ## Challenges Faced
 
-During the implementation of these APIs, a few challenges were encountered:
-1. **Structuring the Codebase**: Moving from a simple monolithic `server.js` file to a structured MVC-like architecture (Routes, Controllers, Services) required careful planning. I addressed this by defining the separation of responsibilities early on: routes just route, controllers manage HTTP context, and services handle Mongoose interactions. This made the code much more readable and maintainable.
-2. **Error Handling & Validation**: MongoDB / Mongoose can throw specific errors (like `CastError` for invalid ObjectIDs or `ValidationError` when required limits aren't met). Instead of returning cryptic 500 server errors, I intercepted these specific error names in the Controller's `catch` blocks and returned descriptive 400 Bad Request responses with the corresponding validation messages. This will improve the frontend development experience.
+During the implementation of this full-stack application, a few main challenges were encountered:
+1. **Structuring the Backend Codebase**: Moving from a simple monolithic `server.js` file to a structured MVC-like architecture (Routes, Controllers, Services) required careful planning. I addressed this by defining the separation of responsibilities early on: routes just route, controllers manage HTTP context, and services handle Mongoose interactions.
+2. **Error Handling & Validation on Backend**: MongoDB can throw specific errors (like `ValidationError`). Instead of returning cryptic 500 server errors, I intercepted these specific error names in the Controller's `catch` blocks and returned descriptive 400 Bad Request responses with the corresponding validation messages.
+3. **Frontend-Backend Integration (CORS)**: When integrating the React frontend running on port 5173 with the Node backend on port 5000, Cross-Origin Resource Sharing (CORS) errors can block requests. I solved this by proactively installing the `cors` package in the Express application and enabling it via `app.use(cors())`.
+4. **State Management in React**: Handling optimistic UI updates and managing asynchronous loading sequences while avoiding layout shift was a priority task. By using Axios inside a robust `try/catch` block within local `App.jsx` methods and appending state immediately to the DOM when responses are successful, the UI feels fast and responsive. 
